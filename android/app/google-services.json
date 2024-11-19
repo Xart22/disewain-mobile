@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "71603567708",
+    "project_id": "disewainaja",
+    "storage_bucket": "disewainaja.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:71603567708:android:5ee57b631e5711e4843a99",
+        "android_client_info": {
+          "package_name": "com.disewainaja"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCudt-ggTchwl9Gb01SpYUWs9iXt9gn1eY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
