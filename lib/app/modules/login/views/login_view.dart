@@ -1,5 +1,5 @@
 import 'package:disewainaja/app/shared/components/buttons/default_button.dart';
-import 'package:disewainaja/app/shared/components/inputs/text/Input_feld.dart';
+import 'package:disewainaja/app/shared/components/inputs/text/Input_field.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';

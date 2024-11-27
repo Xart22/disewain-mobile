@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 class SplashScreenController extends GetxController {
   final _userServeice = Get.find<UserService>();
+  var isLoading = true.obs;
 
   Future<void> checkUser() async {
     bool isLogin = _userServeice.isLoggedIn;
@@ -11,12 +12,7 @@ class SplashScreenController extends GetxController {
       final user = await _userServeice.me();
 
       if (user != null) {
-        if (user.role == 'CSO') {
-          Get.offAllNamed('/CSO');
-        }
-        if (user.role == 'Teknisi') {
-          Get.offAllNamed('/dashboard-teknisi');
-        }
+        Get.offAllNamed('/home');
       } else {
         Get.offAllNamed('/login');
       }

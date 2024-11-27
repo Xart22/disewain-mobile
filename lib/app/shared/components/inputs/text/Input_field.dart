@@ -13,6 +13,7 @@ class InputField extends StatelessWidget {
   final Widget? suffixIcon; // Ikon di belakang
   final String? errorText;
   final TextInputAction textInputAction;
+  final int? maxLines;
 
   const InputField({
     super.key,
@@ -26,6 +27,7 @@ class InputField extends StatelessWidget {
     this.suffixIcon,
     this.errorText,
     required this.textInputAction,
+    this.maxLines,
   });
 
   @override
@@ -43,6 +45,7 @@ class InputField extends StatelessWidget {
           obscureText: obscureText,
           keyboardType: keyboardType,
           textInputAction: textInputAction,
+          maxLines: obscureText ? 1 : maxLines,
           decoration: InputDecoration(
             hintText: hint,
             border: OutlineInputBorder(

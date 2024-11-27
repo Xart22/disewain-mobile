@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:disewainaja/app/services/backgorund_service.dart';
 import 'package:disewainaja/app/services/fcm.dart';
 import 'package:disewainaja/app/services/location_service.dart';
 import 'package:disewainaja/app/services/API/user_service.dart';
@@ -15,10 +16,11 @@ import 'app/routes/app_pages.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
-  await Firebase.initializeApp();
   await _initializeAppBindings();
+  await Firebase.initializeApp();
   FCM().setNotifications();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  await initializeService();
   // HttpOverrides.global = MyHttpOverrides();
   runApp(
     GetMaterialApp(

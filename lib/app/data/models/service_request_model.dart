@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:disewainaja/app/data/models/user_model.dart';
+
 ServiceRequestModel serviceRequestModelFromJson(String str) =>
     ServiceRequestModel.fromJson(json.decode(str));
 
@@ -24,6 +26,15 @@ class ServiceRequestModel {
       };
 }
 
+String formatDate(String date) {
+  final DateTime dateTime = DateTime.parse(date);
+  //format to 'dd-MM-yyyy, HH:mm'
+  final String formattedDate =
+      '${dateTime.day.toString().padLeft(2, '0')}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.year}, ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+
+  return formattedDate;
+}
+
 class ServiceRequest {
   final int id;
   final String noTicket;
@@ -37,15 +48,15 @@ class ServiceRequest {
   final String statusTeknisi;
   final String statusCso;
   final String statusProcess;
-  final String waktuRespon;
-  final dynamic waktuPerjalanan;
-  final dynamic waktuPengerjaan;
-  final dynamic waktuSelesai;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final Technician cso;
+  final String? waktuRespon;
+  final String? waktuPerjalanan;
+  final String? waktuPengerjaan;
+  final String? waktuSelesai;
+  final String createdAt;
+  final String? updatedAt;
+  final User cso;
   final Customer customer;
-  final Technician technician;
+  final User technician;
   final List<dynamic> logs;
 
   ServiceRequest({
@@ -90,11 +101,12 @@ class ServiceRequest {
         waktuPerjalanan: json["waktu_perjalanan"],
         waktuPengerjaan: json["waktu_pengerjaan"],
         waktuSelesai: json["waktu_selesai"],
-        createdAt: DateTime.parse(json["created_at"]),
-        updatedAt: DateTime.parse(json["updated_at"]),
-        cso: Technician.fromJson(json["cso"]),
+        createdAt: formatDate(json["created_at"]),
+        updatedAt:
+            json["updated_at"] == null ? null : formatDate(json["updated_at"]),
+        cso: User.fromJson(json["cso"]),
         customer: Customer.fromJson(json["customer"]),
-        technician: Technician.fromJson(json["technician"]),
+        technician: User.fromJson(json["teknisi"]),
         logs: List<dynamic>.from(json["logs"].map((x) => x)),
       );
 
@@ -115,8 +127,8 @@ class ServiceRequest {
         "waktu_perjalanan": waktuPerjalanan,
         "waktu_pengerjaan": waktuPengerjaan,
         "waktu_selesai": waktuSelesai,
-        "created_at": createdAt.toIso8601String(),
-        "updated_at": updatedAt.toIso8601String(),
+        "created_at": createdAt,
+        "updated_at": updatedAt,
         "cso": cso.toJson(),
         "customer": customer.toJson(),
         "technician": technician.toJson(),
@@ -129,12 +141,12 @@ class Technician {
   final String nip;
   final String name;
   final String role;
-  final dynamic avatar;
-  final dynamic deviceId;
-  final dynamic phoneNumber;
-  final dynamic lokasiKerja;
-  final String latitude;
-  final String longitude;
+  final String? avatar;
+  final String? deviceId;
+  final String? phoneNumber;
+  final String? lokasiKerja;
+  final String? latitude;
+  final String? longitude;
   final String fcmToken;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -195,8 +207,8 @@ class Customer {
   final dynamic email;
   final String phoneNumber;
   final String address;
-  final dynamic latitude;
-  final dynamic longitude;
+  final String latitude;
+  final String longitude;
   final String picProcess;
   final String picProcessPhoneNumber;
   final String picInstallation;

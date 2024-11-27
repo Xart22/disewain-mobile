@@ -9,7 +9,6 @@ class SplashScreenView extends GetView<SplashScreenController> {
   const SplashScreenView({super.key});
   @override
   Widget build(BuildContext context) {
-    controller.onInit();
     return Scaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -19,9 +18,11 @@ class SplashScreenView extends GetView<SplashScreenController> {
                 width: Get.width * 0.5),
           ),
           const SizedBox(height: 10),
-          Loading(
-            size: 20,
-          ),
+          Obx(() => controller.isLoading.value
+              ? Loading(
+                  size: 20,
+                )
+              : Container())
         ],
       ),
     );

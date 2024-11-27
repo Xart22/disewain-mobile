@@ -1,24 +1,22 @@
 import 'package:geolocator/geolocator.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_disposable.dart';
+import 'package:get/get.dart';
+import 'package:map_launcher/map_launcher.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class LocationService extends GetxService {
+  var availableMaps = <AvailableMap>[].obs;
   //request permission
-  Future<bool> requestPermission() async {
-    print('Requesting location permission');
-    final status = await Permission.location.request();
+  Future<void> requestPermission() async {
+    await Permission.location.request();
+  }
+
+  Future<bool> checkPermission() async {
+    final status = await Permission.location.status;
+    availableMaps.value = await MapLauncher.installedMaps;
     if (status.isGranted) {
       return true;
     }
     return false;
-  }
-
-  Future<bool> checkPermission() async {
-    final status = await Permission.locationAlways.status;
-    if (status.isPermanentlyDenied) {
-      return false;
-    }
-    return status.isGranted;
   }
 
   Future<bool> isLocationServiceEnabled() async {
@@ -42,6 +40,26 @@ class LocationService extends GetxService {
       );
     } catch (e) {
       throw Exception('Error getting location: $e');
+    }
+  }
+
+  Future<dynamic> calculateDistance(double lat, double long) async {
+    try {
+      final position = await getCurrentLocation();
+      double distanceInMeters = Geolocator.distanceBetween(
+          lat, long, position!.latitude, position.longitude);
+      if (distanceInMeters < 10) {
+        return {
+          'status': true,
+          'message': 'You are in the location',
+        };
+      }
+      return {
+        'status': false,
+        'message': 'Jarak Anda: ${distanceInMeters.toStringAsFixed(2)} meters',
+      };
+    } catch (e) {
+      throw Exception('Error calculating distance: $e');
     }
   }
 }

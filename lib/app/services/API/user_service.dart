@@ -11,6 +11,8 @@ class UserService extends GetxService {
 
   String get token => storage.read('auth_token');
 
+  User get user => User.fromJson(storage.read('user'));
+
   void saveToken(String token) {
     storage.write('auth_token', token);
   }
@@ -23,6 +25,7 @@ class UserService extends GetxService {
     if (!isLoggedIn) return null;
     try {
       final response = await _userProvider.me(token);
+      storage.write('user', response.user.toJson());
       return response.user;
     } catch (e) {
       return null;

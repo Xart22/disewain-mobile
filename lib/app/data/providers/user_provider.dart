@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
+import 'package:disewainaja/app/helper/config.dart';
 import '../models/user_model.dart';
 
 class UserProvider {
   final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: "http://192.168.1.2/sewainaja/public/api",
+      baseUrl: Config.BASE_URL,
       connectTimeout: Duration(milliseconds: 5000),
       receiveTimeout: Duration(milliseconds: 3000),
     ),

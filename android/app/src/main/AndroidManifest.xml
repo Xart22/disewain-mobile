@@ -1,8 +1,19 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
+          package="com.disewainaja">
     <application
         android:label="disewainaja"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+        <service
+            android:name="id.flutter.flutter_background_service.BackgroundService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:foregroundServiceType="location"
+            android:exported="false"
+            tools:replace="android:exported">
+        </service>
+
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
             <intent-filter>
@@ -61,4 +72,6 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
 </manifest>

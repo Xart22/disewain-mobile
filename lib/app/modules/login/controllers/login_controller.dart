@@ -1,3 +1,4 @@
+import 'package:disewainaja/app/data/models/user_model.dart';
 import 'package:disewainaja/app/data/providers/user_provider.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
@@ -23,8 +24,9 @@ class LoginController extends GetxController {
       );
       if (response.token != null) {
         _saveToken(response.token!);
+        _saveUser(response.user);
       }
-      Get.offAllNamed('/dashboard-teknisi');
+      Get.offAllNamed('/home', arguments: response.user);
     } catch (e) {
       usernameError.value = 'Nip atau password salah';
       passwordError.value = 'Nip atau password salah';
@@ -47,6 +49,10 @@ class LoginController extends GetxController {
 
   void _saveToken(String token) {
     storage.write('auth_token', token);
+  }
+
+  void _saveUser(User user) {
+    storage.write('user', user);
   }
 
   final count = 0.obs;

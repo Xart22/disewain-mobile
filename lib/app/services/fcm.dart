@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'package:disewainaja/app/services/API/user_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -19,14 +20,17 @@ class FCM {
   }
 
   static Future<void> showInstantNotification(String title, String body) async {
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+    NotificationDetails platformChannelSpecifics = NotificationDetails(
         android: AndroidNotificationDetails(
           'instant_notification_channel_id',
           'Instant Notifications',
           importance: Importance.max,
-          priority: Priority.high,
+          priority: Priority.max,
+          sound: RawResourceAndroidNotificationSound('notification'),
+          playSound: true,
+          vibrationPattern: Int64List.fromList([0, 1000, 500, 1000]),
         ),
-        iOS: DarwinNotificationDetails());
+        iOS: const DarwinNotificationDetails());
 
     await flutterLocalNotificationsPlugin.show(
       0,
