@@ -14,6 +14,8 @@ class InputField extends StatelessWidget {
   final String? errorText;
   final TextInputAction textInputAction;
   final int? maxLines;
+  final void Function()? onTap;
+  final bool? readOnly;
 
   const InputField({
     super.key,
@@ -28,6 +30,8 @@ class InputField extends StatelessWidget {
     this.errorText,
     required this.textInputAction,
     this.maxLines,
+    this.onTap,
+    this.readOnly = false,
   });
 
   @override
@@ -37,7 +41,7 @@ class InputField extends StatelessWidget {
       children: [
         Text(
           label,
-          style: GoogleFonts.dmSans(fontSize: 16, fontWeight: FontWeight.w500),
+          style: GoogleFonts.dmSans(fontSize: 12, fontWeight: FontWeight.w500),
         ),
         SizedBox(height: 8),
         TextFormField(
@@ -66,10 +70,13 @@ class InputField extends StatelessWidget {
               ),
               borderRadius: BorderRadius.circular(10),
             ),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
           ),
           validator: validator,
+          onTap: onTap,
+          readOnly: readOnly!,
         ),
-        SizedBox(height: 16),
       ],
     );
   }

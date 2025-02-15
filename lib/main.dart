@@ -33,8 +33,8 @@ void main() async {
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print("Handling a background message: ${message.messageId}");
-  print("Handling a background message: ${message.notification!.title}");
+  // print("Handling a background message: ${message.messageId}");
+  // print("Handling a background message: ${message.notification!.title}");
 }
 
 Future<void> _initializeAppBindings() async {

@@ -1,5 +1,5 @@
-import 'package:disewainaja/app/data/models/user_model.dart';
 import 'package:disewainaja/app/data/providers/user_provider.dart';
+import 'package:disewainaja/app/services/API/user_service.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -7,6 +7,7 @@ import 'package:get_storage/get_storage.dart';
 class LoginController extends GetxController {
   final storage = GetStorage();
   final UserProvider _userProvider = UserProvider();
+  final UserService _userService = Get.find<UserService>();
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   var usernameError = ''.obs;
@@ -23,8 +24,8 @@ class LoginController extends GetxController {
         passwordController.text,
       );
       if (response.token != null) {
-        _saveToken(response.token!);
-        _saveUser(response.user);
+        _userService.saveToken(response.token!);
+        _userService.saveUser(response.user);
       }
       Get.offAllNamed('/home', arguments: response.user);
     } catch (e) {
@@ -47,14 +48,6 @@ class LoginController extends GetxController {
     }
   }
 
-  void _saveToken(String token) {
-    storage.write('auth_token', token);
-  }
-
-  void _saveUser(User user) {
-    storage.write('user', user);
-  }
-
   final count = 0.obs;
   @override
   void onInit() {
@@ -70,6 +63,4 @@ class LoginController extends GetxController {
   void onClose() {
     super.onClose();
   }
-
-  void increment() => count.value++;
 }

@@ -27,7 +27,9 @@ dependencies:
   latlong2: ^0.9.1
   flutter_map_location_marker: ^9.1.1
   map_launcher: ^3.5.0
-  fluttertoast: ^8.2.8
+  url_launcher: ^6.3.1
+  dropdown_search: ^6.0.1
+  webview_flutter: ^4.10.0
 
 dev_dependencies:
   flutter_test:

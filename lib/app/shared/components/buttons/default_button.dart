@@ -25,7 +25,7 @@ class DefaultButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: width ?? double.infinity, // Default tombol full width
-      height: height ?? 48.0, // Default tinggi tombol 48
+      height: height ?? 40, // Default tinggi tombol 48
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(

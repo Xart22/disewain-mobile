@@ -12,6 +12,45 @@ class ServiceRequestProvider {
     ),
   );
 
+  Future<ServiceRequestModel?> getDataServiceRequestCso(String token) async {
+    try {
+      final response = await _dio.get('/customer-support/get-customer-support',
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token',
+            },
+          ));
+      if (response.statusCode == 200) {
+        return ServiceRequestModel.fromJson(response.data);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<String?> sendChat(String token, int id) async {
+    try {
+      final response = await _dio.get('/customer-support/send-chat/$id',
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token',
+            },
+          ));
+      if (response.statusCode == 200) {
+        print(response.data['link']);
+        return response.data['link'];
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
   Future<ServiceRequestModel?> getDataServiceRequestTeknisi(
       String token) async {
     try {
@@ -21,6 +60,27 @@ class ServiceRequestProvider {
               'Authorization': 'Bearer $token',
             },
           ));
+      if (response.statusCode == 200) {
+        return ServiceRequestModel.fromJson(response.data);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<ServiceRequestModel?> getDataServiceRequestByDate(
+      String token, String start, String end) async {
+    try {
+      final response =
+          await _dio.get('/teknisi/get-customer-support/$start/$end',
+              options: Options(
+                headers: {
+                  'Authorization': 'Bearer $token',
+                },
+              ));
       if (response.statusCode == 200) {
         return ServiceRequestModel.fromJson(response.data);
       } else {
@@ -44,6 +104,29 @@ class ServiceRequestProvider {
           data: {
             'status': status,
             'message': message,
+          });
+      ;
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> assignTeknisi(String token, int id, int teknisiId) async {
+    try {
+      final response = await _dio.post('/customer-support/assign-teknisi',
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token',
+            },
+          ),
+          data: {
+            'id': id,
+            'teknisi_id': teknisiId,
           });
       ;
       if (response.statusCode == 200) {

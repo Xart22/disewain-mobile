@@ -26,15 +26,6 @@ class ServiceRequestModel {
       };
 }
 
-String formatDate(String date) {
-  final DateTime dateTime = DateTime.parse(date);
-  //format to 'dd-MM-yyyy, HH:mm'
-  final String formattedDate =
-      '${dateTime.day.toString().padLeft(2, '0')}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.year}, ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
-
-  return formattedDate;
-}
-
 class ServiceRequest {
   final int id;
   final String noTicket;
@@ -43,9 +34,9 @@ class ServiceRequest {
   final String noWaPelapor;
   final String keperluan;
   final String message;
-  final int respondedBy;
-  final int teknisiId;
-  final String statusTeknisi;
+  final int? respondedBy;
+  final int? teknisiId;
+  final String? statusTeknisi;
   final String statusCso;
   final String statusProcess;
   final String? waktuRespon;
@@ -54,10 +45,10 @@ class ServiceRequest {
   final String? waktuSelesai;
   final String createdAt;
   final String? updatedAt;
-  final User cso;
+  final User? cso;
   final Customer customer;
-  final User technician;
-  final List<dynamic> logs;
+  final User? teknisi;
+  final List<Log>? logs;
 
   ServiceRequest({
     required this.id,
@@ -80,7 +71,7 @@ class ServiceRequest {
     required this.updatedAt,
     required this.cso,
     required this.customer,
-    required this.technician,
+    required this.teknisi,
     required this.logs,
   });
 
@@ -101,13 +92,13 @@ class ServiceRequest {
         waktuPerjalanan: json["waktu_perjalanan"],
         waktuPengerjaan: json["waktu_pengerjaan"],
         waktuSelesai: json["waktu_selesai"],
-        createdAt: formatDate(json["created_at"]),
-        updatedAt:
-            json["updated_at"] == null ? null : formatDate(json["updated_at"]),
-        cso: User.fromJson(json["cso"]),
+        createdAt: json["created_at"],
+        updatedAt: json["updated_at"]?.toString(),
+        cso: json["cso"] == null ? null : User.fromJson(json["cso"]),
         customer: Customer.fromJson(json["customer"]),
-        technician: User.fromJson(json["teknisi"]),
-        logs: List<dynamic>.from(json["logs"].map((x) => x)),
+        teknisi:
+            json["teknisi"] == null ? null : User.fromJson(json["teknisi"]),
+        logs: List<Log>.from(json["logs"].map((x) => Log.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -129,14 +120,14 @@ class ServiceRequest {
         "waktu_selesai": waktuSelesai,
         "created_at": createdAt,
         "updated_at": updatedAt,
-        "cso": cso.toJson(),
+        "cso": cso?.toJson(),
         "customer": customer.toJson(),
-        "technician": technician.toJson(),
-        "logs": List<dynamic>.from(logs.map((x) => x)),
+        "teknisi": teknisi?.toJson(),
+        "logs": List<dynamic>.from(logs!.map((x) => x.toJson())),
       };
 }
 
-class Technician {
+class teknisi {
   final int id;
   final String nip;
   final String name;
@@ -151,7 +142,7 @@ class Technician {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  Technician({
+  teknisi({
     required this.id,
     required this.nip,
     required this.name,
@@ -167,7 +158,7 @@ class Technician {
     required this.updatedAt,
   });
 
-  factory Technician.fromJson(Map<String, dynamic> json) => Technician(
+  factory teknisi.fromJson(Map<String, dynamic> json) => teknisi(
         id: json["id"],
         nip: json["nip"],
         name: json["name"],
@@ -304,13 +295,12 @@ class Hardware {
   final String hwModel;
   final String hwSerialNumber;
   final String hwImage;
-  final dynamic hwRelocation;
-  final dynamic hwTechnology;
-  final dynamic hwBwColor;
+  final String? hwRelocation;
+  final String? hwTechnology;
+  final String? hwBwColor;
   final String hwDescription;
   final int usedStatus;
   final int customerId;
-  final dynamic createdAt;
   final DateTime updatedAt;
 
   Hardware({
@@ -327,7 +317,6 @@ class Hardware {
     required this.hwDescription,
     required this.usedStatus,
     required this.customerId,
-    required this.createdAt,
     required this.updatedAt,
   });
 
@@ -345,7 +334,6 @@ class Hardware {
         hwDescription: json["hw_description"],
         usedStatus: json["used_status"],
         customerId: json["customer_id"],
-        createdAt: json["created_at"],
         updatedAt: DateTime.parse(json["updated_at"]),
       );
 
@@ -363,7 +351,50 @@ class Hardware {
         "hw_description": hwDescription,
         "used_status": usedStatus,
         "customer_id": customerId,
+        "updated_at": updatedAt.toIso8601String(),
+      };
+}
+
+class Log {
+  final int id;
+  final int customerSupportId;
+  final int userId;
+  final String status;
+  final String message;
+  final String createdAt;
+  final DateTime updatedAt;
+  final User user;
+
+  Log({
+    required this.id,
+    required this.customerSupportId,
+    required this.userId,
+    required this.status,
+    required this.message,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.user,
+  });
+
+  factory Log.fromJson(Map<String, dynamic> json) => Log(
+        id: json["id"],
+        customerSupportId: json["customer_support_id"],
+        userId: json["user_id"],
+        status: json["status"],
+        message: json["message"],
+        createdAt: json["created_at"],
+        updatedAt: DateTime.parse(json["updated_at"]),
+        user: User.fromJson(json["user"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "customer_support_id": customerSupportId,
+        "user_id": userId,
+        "status": status,
+        "message": message,
         "created_at": createdAt,
         "updated_at": updatedAt.toIso8601String(),
+        "user": user.toJson(),
       };
 }

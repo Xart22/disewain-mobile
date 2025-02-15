@@ -3,14 +3,14 @@ import 'package:disewainaja/app/shared/components/buttons/default_button.dart';
 import 'package:disewainaja/app/shared/components/loading/loading.dart';
 import 'package:disewainaja/app/shared/styles/app_colors.dart';
 import 'package:flutter/material.dart';
+
 import 'package:get/get.dart';
 import 'package:slider_button/slider_button.dart';
 
-import '../controllers/dashboard_teknisi_controller.dart';
+import '../controllers/dashboard_controller.dart';
 
-class DashboardTeknisiView extends GetView<DashboardTeknisiController> {
-  const DashboardTeknisiView({super.key});
-
+class DashboardView extends GetView<DashboardController> {
+  const DashboardView({super.key});
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -115,9 +115,10 @@ class DashboardTeknisiView extends GetView<DashboardTeknisiController> {
           children: [
             _buildServiceHeader(data),
             const SizedBox(height: 10),
-            _buildInformationSection("Informasi Pelaporan", [
+            _buildInformationSection("Informasi Pelapor", [
               _buildRow("Pelapor", data.namaPelapor),
               _buildRow("No. Telepon", data.noWaPelapor),
+              _buildRow("Keperluan", data.keperluan),
               _buildRow("Keluhan", data.message),
             ]),
             const SizedBox(height: 10),
@@ -129,12 +130,14 @@ class DashboardTeknisiView extends GetView<DashboardTeknisiController> {
               Text(data.customer.name, style: _textStyle()),
               Text(data.customer.address, style: _textStyle()),
               const SizedBox(height: 8),
-              data.statusTeknisi == "Waiting"
+              data.statusTeknisi == "Waiting" && controller.role == "Teknisi"
                   ? _buildLocationButton(data)
                   : const SizedBox(),
             ]),
             const SizedBox(height: 10),
-            _buildSliderButtons(data),
+            controller.role == "Teknisi"
+                ? _buildSliderButtons(data)
+                : _buildBtnCSO(data),
           ],
         ),
       ),
@@ -147,7 +150,7 @@ class DashboardTeknisiView extends GetView<DashboardTeknisiController> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          data.createdAt.toString(),
+          data.createdAt,
           style: _textStyle(fontSize: 12),
         ),
         Text(
@@ -181,12 +184,32 @@ class DashboardTeknisiView extends GetView<DashboardTeknisiController> {
   // Row Widget
   Widget _buildRow(String label, String value) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic, // Pastikan teks sejajar
       children: [
-        Text(
-          "$label : ",
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+        // Label
+        SizedBox(
+          width: 70, // Berikan lebar tetap untuk label agar konsisten
+          child: Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+          ),
         ),
-        Text(value, style: _textStyle()),
+        // Titik dua
+        const Text(
+          ":",
+          style: TextStyle(fontSize: 12), // Sesuaikan ukuran teks
+        ),
+        // Spasi
+        const SizedBox(width: 10),
+        // Value
+        SizedBox(
+          width: Get.width * 0.6,
+          child: Text(
+            value,
+            style: _textStyle(),
+          ),
+        ),
       ],
     );
   }
@@ -357,6 +380,56 @@ class DashboardTeknisiView extends GetView<DashboardTeknisiController> {
                   )
                 ],
               )
+            : const SizedBox(),
+      ],
+    );
+  }
+
+  Widget _buildBtnCSO(ServiceRequest data) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            DefaultButton(
+                text: 'Detail',
+                onPressed: () => {
+                      Get.toNamed('/detail', arguments: data),
+                    },
+                width: Get.width / 4),
+            data.statusCso != "Waiting"
+                ? DefaultButton(
+                    text: 'Logs',
+                    onPressed: () => {
+                          Get.toNamed('/logs', arguments: data),
+                        },
+                    width: Get.width / 4,
+                    color: Colors.yellow[800])
+                : const SizedBox(),
+            DefaultButton(
+                text: 'Chat',
+                onPressed: () => {
+                      controller.sendChat(data.id),
+                    },
+                width: Get.width / 4,
+                color: Colors.green),
+          ],
+        ),
+        const SizedBox(height: 10),
+        data.statusCso == "Responded"
+            ? data.teknisi != null
+                ? DefaultButton(
+                    text: 'Tracking',
+                    onPressed: () => {
+                          Get.toNamed('/tracking', arguments: data),
+                        },
+                    color: Colors.blue,
+                    width: Get.width)
+                : DefaultButton(
+                    text: 'Pilih Teknisi',
+                    onPressed: () => {controller.getUserTeknisi(data.id)},
+                    color: Colors.black,
+                    width: Get.width)
             : const SizedBox(),
       ],
     );

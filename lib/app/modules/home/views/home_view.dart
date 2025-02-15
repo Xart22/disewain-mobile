@@ -16,11 +16,14 @@ class HomeView extends GetView<HomeController> {
           'assets/logo/sewainaja-blue.png',
           width: 150,
         ),
-        elevation: 0,
+        backgroundColor: Colors.white,
+        forceMaterialTransparency: true,
       ),
+      backgroundColor: Colors.white,
       body: Obx(() => controller.pages[controller.currentIndex.value]),
       bottomNavigationBar: Obx(
         () => BottomNavigationBar(
+          backgroundColor: Colors.white,
           currentIndex: controller.currentIndex.value,
           onTap: controller.changePage,
           selectedItemColor: AppColors.primary,

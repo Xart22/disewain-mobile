@@ -1,3 +1,4 @@
 class Config {
-  static const String BASE_URL = 'http://192.168.1.2/sewainaja/public/api';
+  static const String BASE_URL = 'https://cs.disewainaja.co.id/api';
+  static const String STORAGE_URL = 'https://cs.disewainaja.co.id/';
 }

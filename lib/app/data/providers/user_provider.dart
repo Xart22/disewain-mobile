@@ -78,4 +78,34 @@ class UserProvider {
       rethrow;
     }
   }
+
+  Future<void> logout(String token) async {
+    try {
+      await _dio.post('/logout',
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token',
+            },
+          ));
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<User>> getUserTeknisi(String token) async {
+    try {
+      final response = await _dio.get('/get-teknisi');
+      if (response.statusCode == 200) {
+        return (response.data['data'] as List)
+            .map((e) => User.fromJson(e))
+            .toList();
+      } else {
+        throw Exception('Gagal mengambil data');
+      }
+    } catch (e, s) {
+      print(s);
+      print(e);
+      rethrow;
+    }
+  }
 }

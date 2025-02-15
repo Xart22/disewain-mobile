@@ -13,6 +13,10 @@ class UserService extends GetxService {
 
   User get user => User.fromJson(storage.read('user'));
 
+  void saveUser(User user) async {
+    await storage.write('user', user);
+  }
+
   void saveToken(String token) {
     storage.write('auth_token', token);
   }
@@ -45,6 +49,16 @@ class UserService extends GetxService {
   Future<void> updateLocation(double latitude, double longitude) async {
     try {
       await _userProvider.updateLocation(token, latitude, longitude);
+    } catch (e) {
+      return;
+    }
+  }
+
+  // logout
+  Future<void> logout() async {
+    try {
+      await storage.erase();
+      await _userProvider.logout(token);
     } catch (e) {
       return;
     }

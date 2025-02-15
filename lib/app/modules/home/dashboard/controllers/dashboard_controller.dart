@@ -1,28 +1,32 @@
 import 'package:disewainaja/app/data/models/service_request_model.dart';
 import 'package:disewainaja/app/data/providers/service_request_provider.dart';
+import 'package:disewainaja/app/data/providers/user_provider.dart';
 import 'package:disewainaja/app/services/API/user_service.dart';
 import 'package:disewainaja/app/services/location_service.dart';
 import 'package:disewainaja/app/shared/components/buttons/default_button.dart';
+import 'package:disewainaja/app/shared/components/inputs/select/select_search.dart';
 import 'package:disewainaja/app/shared/components/inputs/text/Input_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:map_launcher/map_launcher.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class DashboardTeknisiController extends FullLifeCycleController
+class DashboardController extends FullLifeCycleController
     with GetSingleTickerProviderStateMixin, FullLifeCycleMixin {
   final storage = GetStorage();
   final _userServeice = Get.find<UserService>();
+  final UserProvider _userProvider = UserProvider();
   final _locationService = Get.find<LocationService>();
   final ServiceRequestProvider _serviceRequestProvider =
       ServiceRequestProvider();
   TextEditingController alasanController = TextEditingController();
+  late String role;
 
   //data
   var dataServiceRequestBaru = <ServiceRequest?>[].obs;
   var dataServiceRequestDiproses = <ServiceRequest?>[].obs;
-  var dataServiceRequestSelesai = <ServiceRequest?>[].obs;
 
   var availableMaps = <AvailableMap>[];
 
@@ -35,6 +39,24 @@ class DashboardTeknisiController extends FullLifeCycleController
   ];
 
   var isLoading = true.obs;
+
+  void sendChat(int id) async {
+    isLoading.value = true;
+    try {
+      final link =
+          await _serviceRequestProvider.sendChat(_userServeice.token, id);
+      if (link != null) {
+        await launchUrl(Uri.parse(link), mode: LaunchMode.externalApplication);
+      }
+      await getData();
+      isLoading.value = false;
+    } catch (e) {
+      Get.snackbar('Gagal', 'Gagal mengirim chat',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white);
+    }
+  }
 
   void startTracking() async {
     final service = FlutterBackgroundService();
@@ -82,31 +104,51 @@ class DashboardTeknisiController extends FullLifeCycleController
   }
 
   Future<void> getData() async {
-    try {
-      final data = await _serviceRequestProvider
-          .getDataServiceRequestTeknisi(_userServeice.token);
-      if (data != null) {
-        dataServiceRequestBaru.clear();
-        dataServiceRequestDiproses.clear();
-        dataServiceRequestSelesai.clear();
-        dataServiceRequestBaru.value = data.data
-            .where((element) => element?.statusTeknisi == 'Waiting')
-            .toList();
-        dataServiceRequestDiproses.value = data.data
-            .where((element) =>
-                element?.statusTeknisi == 'On The Way' ||
-                element?.statusTeknisi == 'Arrived' ||
-                element?.statusTeknisi == 'Working')
-            .toList();
-        dataServiceRequestSelesai.value = data.data
-            .where((element) => element?.statusTeknisi == 'Done')
-            .toList();
+    isLoading.value = true;
+
+    if (role == "CSO" || role == "Admin") {
+      try {
+        final data = await _serviceRequestProvider
+            .getDataServiceRequestCso(_userServeice.token);
+        if (data != null) {
+          dataServiceRequestBaru.clear();
+          dataServiceRequestDiproses.clear();
+          dataServiceRequestBaru.value = data.data
+              .where((element) => element?.statusCso == 'Waiting')
+              .toList();
+          dataServiceRequestDiproses.value = data.data
+              .where((element) => element?.statusCso == 'Responded')
+              .toList();
+        }
+        tabController.index = dataServiceRequestBaru.isEmpty ? 1 : 0;
+        isLoading.value = false;
+      } catch (e, s) {
+        print(e);
+        print(s);
       }
-      tabController.index = dataServiceRequestBaru.isEmpty ? 1 : 0;
-      isLoading.value = false;
-    } catch (e, s) {
-      print(e);
-      print(s);
+    } else {
+      try {
+        final data = await _serviceRequestProvider
+            .getDataServiceRequestTeknisi(_userServeice.token);
+        if (data != null) {
+          dataServiceRequestBaru.clear();
+          dataServiceRequestDiproses.clear();
+          dataServiceRequestBaru.value = data.data
+              .where((element) => element?.statusTeknisi == 'Waiting')
+              .toList();
+          dataServiceRequestDiproses.value = data.data
+              .where((element) =>
+                  element?.statusTeknisi == 'On The Way' ||
+                  element?.statusTeknisi == 'Arrived' ||
+                  element?.statusTeknisi == 'Working')
+              .toList();
+        }
+        tabController.index = dataServiceRequestBaru.isEmpty ? 1 : 0;
+        isLoading.value = false;
+      } catch (e, s) {
+        print(e);
+        print(s);
+      }
     }
   }
 
@@ -280,15 +322,84 @@ class DashboardTeknisiController extends FullLifeCycleController
     }
   }
 
+  void getUserTeknisi(int id) async {
+    try {
+      int teknisiId = 0;
+      isLoading.value = true;
+      final data = await _userProvider.getUserTeknisi(_userServeice.token);
+      isLoading.value = false;
+      Get.defaultDialog(
+        title: 'Pilih Teknisi',
+        content: SelectSearch(
+          label: 'Teknisi',
+          data: data,
+          onChanged: (value) {
+            if (value != null) {
+              teknisiId = value.id;
+            }
+          },
+        ),
+        actions: [
+          DefaultButton(
+              width: Get.width / 4,
+              height: Get.height / 20,
+              onPressed: () async {
+                isLoading.value = true;
+                if (teknisiId != 0) {
+                  final res = await _serviceRequestProvider.assignTeknisi(
+                      _userServeice.token, id, teknisiId);
+                  if (res) {
+                    Get.back();
+                    Get.snackbar('Berhasil', 'Berhasil mengassign teknisi',
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: Colors.green,
+                        colorText: Colors.white);
+                    await getData();
+                  } else {
+                    Get.snackbar('Gagal', 'Gagal mengassign teknisi',
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white);
+                  }
+                } else {
+                  Get.snackbar('Gagal', 'Pilih teknisi terlebih dahulu',
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white);
+                }
+                isLoading.value = false;
+              },
+              text: 'Kirim'),
+          DefaultButton(
+            width: Get.width / 4,
+            height: Get.height / 20,
+            color: Colors.red,
+            onPressed: () {
+              Get.back();
+            },
+            text: 'Tutup',
+          ),
+        ],
+      );
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   void onInit() async {
-    super.onInit();
     tabController = TabController(
         length: listTab.length,
         vsync: this,
         initialIndex: dataServiceRequestBaru.isEmpty ? 1 : 0);
-    await getData();
 
+    if (Get.arguments != null) {
+      role = Get.arguments.role;
+    } else {
+      role = _userServeice.user.role;
+    }
+    super.onInit();
+    await getData();
     availableMaps = await MapLauncher.installedMaps;
     requestPermission();
   }
